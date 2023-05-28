@@ -27,45 +27,64 @@ const style = {
 const Lessons = () => {
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
+   //derslerin tutulduğu state tanımlanır
    const [lessonsData, setLessonsData] = useState({});
+   // derslerin bulunduğu sayfadan konferansların bulunduğu sayfaya geçiş için kullanılır
+   // useNavigate ilgili sayfaya yönlendirme yapan bir react-router hookudur.
    const navigate = useNavigate();
+   // video modalı için kullanılır , videoId state'i ile video id tutulur.
+   // youtube iframe oluşturulması için gereklidir.
    const [videoId, setVideoId] = useState("");
+   // modalın açık olup olmadığını tutar.
    const [open, setOpen] = useState(false);
+   // konferans oluşturulduğunda kullanıcıya gösterilen snackbar için kullanılır.
    const [isAlertOpen, setAlertOpen] = useState(false);
+   // ilgili dersin quiz verisini tutan statedir.
    const [questions, setQuestions] = useState([]);
+   // ilgili dersin video linkinden video id'sini alır ve modalı açar.
    const handleOpen = (e) => {
       setVideoId(e.target.value.split("v=")[1]);
       setOpen(true);
    };
+   // modalı kapatan fonksiyondur.
    const handleClose = () => setOpen(false);
+   // tüm ders verilerini çeken fonksiyondur.
+   // fetchData servisler altında tanımlanmıştır ve ilgili endpointten verileri çeker.
    const setData = () => {
       fetchData().then((res) => {
          setLessonsData(res);
       });
    };
+   // ilgili derste kullanıcının yaptığı tıklama türüne göre ilgili işlemleri opare eder.
    const handleClickLesson = (lessonId, lessonName, type) => {
+      // dersi öğretmek isteyen kullanıcı için konferans oluşturulması işlemini servise bildiren kod parçasıdır.
       if (type === "teach")
          createConference({
             related_lesson: lessonId,
             conference_topic: lessonName,
          }).then((res) => {
+            // konferans oluşturulduktan sonra kullanıcıya bildirim gösterilmesi için kullanılır.
             if (res.status == "success") setAlertOpen(true);
          });
       if (type == "listen") {
+         // ilgili ders id si ile konferanslar componentine yönlendirme yapar. ve lessonId parametresi ekler
          navigate("/calendar/" + lessonId);
       }
    };
+   // ilgili dersin quiz verisini çeken fonksiyondur.
    const handleFetchQuiz = (lessonId) => {
       fetchQuiz(5).then((res) => {
          setQuestions(res);
       });
    };
+   // sayfa ilk render olduğunda ders verilerini çeker.
    useEffect(() => {
       setData();
    }, []);
    return (
       <Box m="20px">
          <Header title="Dersler" subtitle="Ders listesi aşağıda listelenmiştir." />
+         {/*ders kategorisine göre kategoriye ait dersler gerekli if kontrolleri ile kullanıcıya düzgün şekilde listelenir. */}
          {lessonsData.categories &&
             lessonsData.categories.map((category) => (
                <Accordion defaultExpanded key={category.id}>
@@ -86,6 +105,7 @@ const Lessons = () => {
                                           <Typography variant="h3">
                                              {index + 1}- {lesson.lesson_title}
                                           </Typography>
+                                          {/* dersin zorluk derecesini göstermek için kullanılan kod parçasıdır difficulty verisi derslerden alınmaktadır. */}
                                           {lesson && lesson.difficulty && (
                                              <React.Fragment>
                                                 {(() => {
@@ -107,6 +127,9 @@ const Lessons = () => {
                                        </AccordionSummary>
                                        <AccordionDetails>
                                           <Box>
+                                             {/* dersin içeriğini ekranda render eden kod parçasıdır. 
+                                             content içerisinde bulunan related_lesson ile ilgili dersin lesson id si eşleşiyorsa ilgili içerikler ekranda gösterilir.
+                                             */}
                                              {lessonsData.contents &&
                                                 lessonsData.contents.map(
                                                    (content, index) =>
@@ -122,6 +145,7 @@ const Lessons = () => {
                                                             <Button size="small" color="success" variant="contained" onClick={handleFetchQuiz}>
                                                                Go to quiz
                                                             </Button>
+                                                            {/* öğreten mi öğretici mi olacağı burada tıkladığı buton ile karar verilir ve konferans işlemleri gerçekleşir */}
                                                             <Button
                                                                onClick={() => {
                                                                   handleClickLesson(content.related_lesson, lesson.lesson_title, "teach");
@@ -156,6 +180,7 @@ const Lessons = () => {
                   </AccordionDetails>
                </Accordion>
             ))}
+         {/* ilgili dersin video linkinden video id'sini alır ve modalı açar. Iframe ile youtube linkini ekrana yansıtır. */}
          <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
             <Box>
                <Box style={style} marginTop={8}>
@@ -169,11 +194,13 @@ const Lessons = () => {
                </Box>
             </Box>
          </Modal>
+         {/* konferans oluşturulduktan sonra kullanıcıya bildirim gösterilmesi için kullanılır. */}
          <Snackbar open={isAlertOpen} autoHideDuration={6000} onClose={handleClose}>
             <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
                Ders anlatım video konferans linki oluşturuldu.
             </Alert>
          </Snackbar>
+         {/* quiz verisi varsa quiz componenti render edilir. ve soru verileri quizcomponent isimli componente aktarılır. */}
          {questions.length > 0 && <QuizComponent questions={questions} />}
       </Box>
    );

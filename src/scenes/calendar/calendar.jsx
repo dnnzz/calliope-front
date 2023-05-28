@@ -14,13 +14,20 @@ const Calendar = () => {
    const theme = useTheme();
    let { lessonId } = useParams();
    const colors = tokens(theme.palette.mode);
+   // mevcut konferansların tutulduğu state tanımlanır
    const [currentEvents, setCurrentEvents] = useState([]);
-
+   // konferansların çekildiği fonksiyon eğer ders idsi verilirse sadece o dersin konferanslarını filtrelenecektir
+   // ders id si verilmezse tüm konferanslar çekilecektir ve ekranda gösterilecektir
+   // Ders id si  react-router ile alınır kullanıcı eğer dersler bölümünden ilgili derse tıklayarak bu sayfaya gelmiş ise
+   // url sonunda lessonId isimli bir parametre olacaktır ?lessonId=1 gibi
    const setEvents = async () => {
       let lessons = [];
+      // tüm dersler bilgisi çekilir ve lessons isimli geçici değişkene atanır
+      // bunun sebebi konferansların ilgili ders bilgisini de göstermesi gerekmektedir bu durumda konferans verisinde bulunan related_lesson verisi ile sağlanmaktadır
       fetchLessons().then((res) => (lessons = res.lessons));
       fetchConferences().then((res) => {
          if (lessonId) {
+            // lessonId varlığı burada kontrol edilip ilgili filtreleme fonksiyonu yapılmaktadır
             setCurrentEvents(
                res
                   .filter((event) => event.related_lesson == lessonId)
@@ -38,12 +45,14 @@ const Calendar = () => {
                            "|| Ders : " +
                            lessons.find((lesson) => lesson.id === conference.related_lesson).lesson_title,
                         date: formattedNextDay,
+                        // konferans meet linki ve ilgili ders objeye tanımlanır
                         conference_url: conference.conference_url,
                         related_lesson: conference.related_lesson,
                      };
                   })
             );
          } else {
+            // yukarda verilen bilgiler doğrultusunda bu kod parçacığı ise tüm konferansları gösteren kısımdır.
             setCurrentEvents(
                res.map((conference) => {
                   const currentDate = new Date();
@@ -67,6 +76,7 @@ const Calendar = () => {
          }
       });
    };
+   // konferanslara tıklandığında ilgili konferansın meet linkine yönlendirme yapılır
    const handleEventClick = (clickedEvent) => {
       if (clickedEvent.event) {
          window.open(clickedEvent.event._def.extendedProps.conference_url, "_blank");
@@ -74,6 +84,7 @@ const Calendar = () => {
          window.open(clickedEvent, "_blank");
       }
    };
+   // sayfa ilk render olduğunda konferans verilerini çekmek için useEffect kullandık
    useEffect(() => {
       setEvents();
    }, []);

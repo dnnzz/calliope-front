@@ -10,6 +10,10 @@ import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined
 import PlayLessonIcon from "@mui/icons-material/PlayLesson";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 
+// Ekranın solunda bulunan sidebar componenti ilgili sayfalara yönlendirme yapan bir menü içerir.
+// React router'da bulunan Link componenti ile başlık ve gidilmesi istenen sayfa belirtilir.
+// Item componenti bir yardımcı component olarak kullanılmıştır. Gereksiz kod tekrarnından kaçınmak için.
+// title , to , icon , selected , setSelected parametreleri alır.
 const Item = ({ title, to, icon, selected, setSelected }) => {
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
@@ -97,6 +101,7 @@ const Sidebar = () => {
                )}
 
                <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+                  {/* Yazdığımız yardımcı componentin kullanım örnekleri aşağıdadır. */}
                   <Item title="Dashboard" to="/" icon={<HomeOutlinedIcon />} selected={selected} setSelected={setSelected} />
 
                   <Typography variant="h6" color={colors.grey[300]} sx={{ m: "15px 0 5px 20px" }}>

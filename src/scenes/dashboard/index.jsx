@@ -4,6 +4,7 @@ import GeographyChart from "../../components/GeographyChart";
 import BarChart from "../../components/BarChart";
 
 const Dashboard = () => {
+   // tamamen demo bir ekran veriler statik gömülüdür.
    const theme = useTheme();
    const colors = tokens(theme.palette.mode);
 
