@@ -22,9 +22,9 @@ const createUser = async (user) => {
    }
 };
 
-const updateUser = async (userId, user) => {
+const updateUser = async (user) => {
    try {
-      const response = await axios.put(`${API_URL}/user/u/${userId}`, user);
+      const response = await axios.put(`${API_URL}/user/update/`, user);
       return response.data;
    } catch (error) {
       console.error("Error while updating user:", error);

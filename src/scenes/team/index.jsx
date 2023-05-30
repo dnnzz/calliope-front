@@ -36,6 +36,7 @@ const Team = () => {
 
    const [role, setRole] = useState(0);
    const [userName, setUserName] = useState("");
+   const [userScore, setUserScore] = useState("");
    const [userPayload, setUserPayload] = useState({});
 
    const handleChange = (event) => {
@@ -44,12 +45,16 @@ const Team = () => {
    const handleUserNameChange = (event) => {
       setUserName(event.target.value);
    };
+   const handleUserScoreChange = (event) => {
+      setUserScore(event.target.value);
+   };
    const setUsersData = () => {
       getUsers().then((res) => setUsers(res));
    };
    const postUserData = () => {
       if (edit) {
-         updateUser(userPayload.id, { role: role, user_name: userName }).then((res) => {
+         console.log(userPayload);
+         updateUser({ id: userPayload.id, score: userScore, role: role, user_name: userName }).then((res) => {
             console.log(res);
             setOpen(false);
             clearAll();
@@ -70,9 +75,10 @@ const Team = () => {
       setUserPayload({});
    };
    const handleRowClick = (params) => {
-      setUserPayload(params);
+      setUserPayload(params.row);
       setUserName(params.row.user_name);
       setRole(params.row.role);
+      setUserScore(params.row.score);
       setOpen(true);
       setEdit(true);
    };
@@ -119,7 +125,7 @@ const Team = () => {
       },
       {
          field: "score",
-         headerName: "Quiz puanı",
+         headerName: "Skor",
          flex: 1,
       },
    ];
@@ -177,7 +183,22 @@ const Team = () => {
                            <MenuItem value={2}>Eğitmen</MenuItem>
                         </Select>
                      </FormGroup>
-                     <TextField value={userName} onChange={handleUserNameChange} id="standard-inp" label="KULLANICI ISMI" variant="standard" />
+                     <TextField
+                        style={{ marginTop: "16px" }}
+                        value={userName}
+                        onChange={handleUserNameChange}
+                        id="standard-inp"
+                        label="KULLANICI ISMI"
+                        variant="standard"
+                     />
+                     <TextField
+                        style={{ marginTop: "16px" }}
+                        value={userScore}
+                        onChange={handleUserScoreChange}
+                        id="standard-inp"
+                        label="SKOR"
+                        variant="standard"
+                     />
                   </FormControl>
                   <Button onClick={postUserData} style={{ backgroundColor: "#70d8bd", marginTop: "16px" }}>
                      {edit ? "Düzenle" : "Oluştur"}
