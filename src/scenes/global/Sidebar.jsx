@@ -103,11 +103,11 @@ const Sidebar = () => {
                <Box paddingLeft={isCollapsed ? undefined : "10%"}>
                   {/* Yazdığımız yardımcı componentin kullanım örnekleri aşağıdadır. */}
                   <Item title="Dashboard" to="/" icon={<HomeOutlinedIcon />} selected={selected} setSelected={setSelected} />
-
+                  {/* 
                   <Typography variant="h6" color={colors.grey[300]} sx={{ m: "15px 0 5px 20px" }}>
                      Kullanıcı
-                  </Typography>
-                  <Item title="Kullanıcı listesi" to="/users" icon={<PeopleOutlinedIcon />} selected={selected} setSelected={setSelected} />
+                  </Typography> */}
+                  {/* <Item title="Kullanıcı listesi" to="/users" icon={<PeopleOutlinedIcon />} selected={selected} setSelected={setSelected} /> */}
 
                   <Typography variant="h6" color={colors.grey[300]} sx={{ m: "15px 0 5px 20px" }}>
                      Ders

@@ -41,10 +41,13 @@ const Lessons = () => {
    const [isAlertOpen, setAlertOpen] = useState(false);
    // ilgili dersin quiz verisini tutan statedir.
    const [questions, setQuestions] = useState([]);
+   const [quizPoint, setQuizPoint] = useState(0);
+   const [isQuizBtnVisible, setIsQuizBtnVisible] = useState(false);
    // ilgili dersin video linkinden video id'sini alır ve modalı açar.
    const handleOpen = (e) => {
       setVideoId(e.target.value.split("v=")[1]);
       setOpen(true);
+      setIsQuizBtnVisible(true);
    };
    // modalı kapatan fonksiyondur.
    const handleClose = () => setOpen(false);
@@ -76,6 +79,9 @@ const Lessons = () => {
       fetchQuiz(5).then((res) => {
          setQuestions(res);
       });
+   };
+   const handlerQuizPoint = (point) => {
+      setQuizPoint(point);
    };
    // sayfa ilk render olduğunda ders verilerini çeker.
    useEffect(() => {
@@ -142,32 +148,40 @@ const Lessons = () => {
                                                             <Button variant="contained" value={content.video_url} size="small" onClick={handleOpen}>
                                                                Lesson Video
                                                             </Button>
-                                                            <Button size="small" color="success" variant="contained" onClick={handleFetchQuiz}>
-                                                               Go to quiz
-                                                            </Button>
+                                                            {isQuizBtnVisible && (
+                                                               <Button size="small" color="success" variant="contained" onClick={handleFetchQuiz}>
+                                                                  Go to quiz
+                                                               </Button>
+                                                            )}
                                                             {/* öğreten mi öğretici mi olacağı burada tıkladığı buton ile karar verilir ve konferans işlemleri gerçekleşir */}
-                                                            <Button
-                                                               onClick={() => {
-                                                                  handleClickLesson(content.related_lesson, lesson.lesson_title, "teach");
-                                                               }}
-                                                               style={{ marginLeft: "12px" }}
-                                                               type="button"
-                                                               color="info"
-                                                               variant="contained"
-                                                               size="small">
-                                                               Teach this lesson
-                                                            </Button>
-                                                            <Button
-                                                               onClick={() => {
-                                                                  handleClickLesson(content.related_lesson, lesson.lesson_title, "listen");
-                                                               }}
-                                                               style={{ marginLeft: "12px" }}
-                                                               type="button"
-                                                               color="error"
-                                                               variant="contained"
-                                                               size="small">
-                                                               Listen from another student
-                                                            </Button>
+                                                            {quizPoint >= 80 ? (
+                                                               <Button
+                                                                  onClick={() => {
+                                                                     handleClickLesson(content.related_lesson, lesson.lesson_title, "teach");
+                                                                  }}
+                                                                  style={{ marginLeft: "12px" }}
+                                                                  type="button"
+                                                                  color="info"
+                                                                  variant="contained"
+                                                                  size="small">
+                                                                  Teach this lesson
+                                                               </Button>
+                                                            ) : (
+                                                               quizPoint > 0 &&
+                                                               quizPoint <= 79 && (
+                                                                  <Button
+                                                                     onClick={() => {
+                                                                        handleClickLesson(content.related_lesson, lesson.lesson_title, "listen");
+                                                                     }}
+                                                                     style={{ marginLeft: "12px" }}
+                                                                     type="button"
+                                                                     color="error"
+                                                                     variant="contained"
+                                                                     size="small">
+                                                                     Listen from another student
+                                                                  </Button>
+                                                               )
+                                                            )}
                                                          </Box>
                                                       )
                                                 )}
@@ -201,7 +215,7 @@ const Lessons = () => {
             </Alert>
          </Snackbar>
          {/* quiz verisi varsa quiz componenti render edilir. ve soru verileri quizcomponent isimli componente aktarılır. */}
-         {questions.length > 0 && <QuizComponent questions={questions} />}
+         {questions.length > 0 && <QuizComponent questions={questions} quizPoint={quizPoint} setQuizPoint={handlerQuizPoint} />}
       </Box>
    );
 };

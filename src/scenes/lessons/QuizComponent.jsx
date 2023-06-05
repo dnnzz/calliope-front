@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Typography, Button, Radio, RadioGroup, FormControlLabel, FormControl, Chip, Box } from "@mui/material";
 // questions isimli bir array alır. Bu array içerisinde sorular ve cevapları bulunur.
 // bu veri bir üstteki lessons componentinden alır.
-const QuizComponent = ({ questions }) => {
+const QuizComponent = ({ questions, quizPoint, setQuizPoint }) => {
    // quizin mevcut soru indexini tutar ve ilgili indexteki soruyu gösterir.
    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
    // quizin mevcut skorunu tutar kullanıcı doğru cevap verdiğinde skor 1 artar.
@@ -31,14 +31,31 @@ const QuizComponent = ({ questions }) => {
 
    // quizin bitip bitmediğini kontrol eder ve eğer bittiyse skoru gösterir
    if (currentQuestionIndex >= questions.length) {
-      return (
-         <div>
-            <Typography variant="h4">Quiz Completed!</Typography>
-            <Typography variant="h6">
-               Your Score: {score} / {questions.length}
-            </Typography>
-         </div>
-      );
+      const successRate = (score / questions.length) * 100;
+      setQuizPoint(successRate);
+      if (successRate >= 80) {
+         return (
+            <div>
+               <Typography variant="h4">Quiz Completed!</Typography>
+               <Typography variant="h6">
+                  Your Score: {score} / {questions.length}
+               </Typography>
+               <Typography variant="h6">Success Rate: {successRate}%</Typography>
+               <Typography variant="h6">Congratulations! You passed the quiz with a success rate of at least 80%.</Typography>
+            </div>
+         );
+      } else {
+         return (
+            <div>
+               <Typography variant="h4">Quiz Completed!</Typography>
+               <Typography variant="h6">
+                  Your Score: {score} / {questions.length}
+               </Typography>
+               <Typography variant="h6">Success Rate: {successRate}%</Typography>
+               <Typography variant="h6">Unfortunately, your success rate is below 80%. Please try again.</Typography>
+            </div>
+         );
+      }
    }
    // mevcut soruyu bulur ve eğer mevcut ise soruyu gösterir
    const currentQuestion = questions[currentQuestionIndex];
