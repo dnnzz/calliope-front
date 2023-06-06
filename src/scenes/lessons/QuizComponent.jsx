@@ -32,7 +32,7 @@ const QuizComponent = ({ questions, quizPoint, setQuizPoint }) => {
    // quizin bitip bitmediğini kontrol eder ve eğer bittiyse skoru gösterir
    if (currentQuestionIndex >= questions.length) {
       const successRate = (score / questions.length) * 100;
-      setQuizPoint(successRate);
+      setQuizPoint(successRate == 0 ? 0.01 : successRate);
       if (successRate >= 80) {
          return (
             <div>

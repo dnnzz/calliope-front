@@ -4,6 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
+import { useNavigate } from "react-router-dom";
 import { Box, List, ListItem, ListItemText, Typography, useTheme } from "@mui/material";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
@@ -16,6 +17,8 @@ const Calendar = () => {
    const colors = tokens(theme.palette.mode);
    // mevcut konferansların tutulduğu state tanımlanır
    const [currentEvents, setCurrentEvents] = useState([]);
+   const navigate = useNavigate();
+
    // konferansların çekildiği fonksiyon eğer ders idsi verilirse sadece o dersin konferanslarını filtrelenecektir
    // ders id si verilmezse tüm konferanslar çekilecektir ve ekranda gösterilecektir
    // Ders id si  react-router ile alınır kullanıcı eğer dersler bölümünden ilgili derse tıklayarak bu sayfaya gelmiş ise

@@ -11,7 +11,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import QuizComponent from "./QuizComponent.jsx";
 import React from "react";
+import YouTube from "react-youtube";
 import { fetchQuiz } from "../../services/quiz";
+import CommentComponent from "./CommentComponent";
 const style = {
    position: "absolute",
    top: "50%",
@@ -32,25 +34,14 @@ const Lessons = () => {
    // derslerin bulunduğu sayfadan konferansların bulunduğu sayfaya geçiş için kullanılır
    // useNavigate ilgili sayfaya yönlendirme yapan bir react-router hookudur.
    const navigate = useNavigate();
-   // video modalı için kullanılır , videoId state'i ile video id tutulur.
-   // youtube iframe oluşturulması için gereklidir.
-   const [videoId, setVideoId] = useState("");
-   // modalın açık olup olmadığını tutar.
-   const [open, setOpen] = useState(false);
+
    // konferans oluşturulduğunda kullanıcıya gösterilen snackbar için kullanılır.
    const [isAlertOpen, setAlertOpen] = useState(false);
    // ilgili dersin quiz verisini tutan statedir.
    const [questions, setQuestions] = useState([]);
    const [quizPoint, setQuizPoint] = useState(0);
    const [isQuizBtnVisible, setIsQuizBtnVisible] = useState(false);
-   // ilgili dersin video linkinden video id'sini alır ve modalı açar.
-   const handleOpen = (e) => {
-      setVideoId(e.target.value.split("v=")[1]);
-      setOpen(true);
-      setIsQuizBtnVisible(true);
-   };
-   // modalı kapatan fonksiyondur.
-   const handleClose = () => setOpen(false);
+   const handleClose = () => setAlertOpen(false);
    // tüm ders verilerini çeken fonksiyondur.
    // fetchData servisler altında tanımlanmıştır ve ilgili endpointten verileri çeker.
    const setData = () => {
@@ -78,10 +69,14 @@ const Lessons = () => {
    const handleFetchQuiz = (lessonId) => {
       fetchQuiz(5).then((res) => {
          setQuestions(res);
+         setIsQuizBtnVisible(false);
       });
    };
    const handlerQuizPoint = (point) => {
       setQuizPoint(point);
+   };
+   const handleVideoEnd = () => {
+      setIsQuizBtnVisible(true);
    };
    // sayfa ilk render olduğunda ders verilerini çeker.
    useEffect(() => {
@@ -132,60 +127,106 @@ const Lessons = () => {
                                           )}
                                        </AccordionSummary>
                                        <AccordionDetails>
-                                          <Box>
-                                             {/* dersin içeriğini ekranda render eden kod parçasıdır. 
+                                          <Accordion>
+                                             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                                <Typography variant="h4">Ders İçeriği</Typography>
+                                             </AccordionSummary>
+                                             <AccordionDetails>
+                                                <Box>
+                                                   {/* dersin içeriğini ekranda render eden kod parçasıdır. 
                                              content içerisinde bulunan related_lesson ile ilgili dersin lesson id si eşleşiyorsa ilgili içerikler ekranda gösterilir.
                                              */}
-                                             {lessonsData.contents &&
-                                                lessonsData.contents.map(
-                                                   (content, index) =>
-                                                      content.related_lesson === lesson.id && (
-                                                         <Box key={"ctx" + content.id}>
-                                                            <Typography variant="h4">{content.content_header}</Typography>
+                                                   {lessonsData.contents &&
+                                                      lessonsData.contents.map(
+                                                         (content, index) =>
+                                                            content.related_lesson === lesson.id && (
+                                                               <Box key={"ctx" + content.id}>
+                                                                  <Typography variant="h4">{content.content_header}</Typography>
 
-                                                            <Typography>{content.content_text}</Typography>
-                                                            <br />
-                                                            <Button variant="contained" value={content.video_url} size="small" onClick={handleOpen}>
-                                                               Lesson Video
-                                                            </Button>
-                                                            {isQuizBtnVisible && (
-                                                               <Button size="small" color="success" variant="contained" onClick={handleFetchQuiz}>
-                                                                  Go to quiz
-                                                               </Button>
-                                                            )}
-                                                            {/* öğreten mi öğretici mi olacağı burada tıkladığı buton ile karar verilir ve konferans işlemleri gerçekleşir */}
-                                                            {quizPoint >= 80 ? (
-                                                               <Button
-                                                                  onClick={() => {
-                                                                     handleClickLesson(content.related_lesson, lesson.lesson_title, "teach");
-                                                                  }}
-                                                                  style={{ marginLeft: "12px" }}
-                                                                  type="button"
-                                                                  color="info"
-                                                                  variant="contained"
-                                                                  size="small">
-                                                                  Teach this lesson
-                                                               </Button>
-                                                            ) : (
-                                                               quizPoint > 0 &&
-                                                               quizPoint <= 79 && (
-                                                                  <Button
-                                                                     onClick={() => {
-                                                                        handleClickLesson(content.related_lesson, lesson.lesson_title, "listen");
-                                                                     }}
-                                                                     style={{ marginLeft: "12px" }}
-                                                                     type="button"
-                                                                     color="error"
-                                                                     variant="contained"
-                                                                     size="small">
-                                                                     Listen from another student
-                                                                  </Button>
-                                                               )
-                                                            )}
-                                                         </Box>
-                                                      )
-                                                )}
-                                          </Box>
+                                                                  <Typography>{content.content_text}</Typography>
+                                                                  <br />
+                                                                  <Box>
+                                                                     <Box style={{ display: "flex" }}>
+                                                                        <Box>
+                                                                           <Typography variant="h4">Lesson Video</Typography>
+                                                                           <YouTube
+                                                                              videoId={content.video_url.split("v=")[1]} // defaults -> ''
+                                                                              title={"Lession Video"} // defaults -> ''
+                                                                              onEnd={handleVideoEnd} // defaults -> noop
+                                                                           />
+                                                                        </Box>
+                                                                        <Box marginLeft={16}>
+                                                                           {/* quiz verisi varsa quiz componenti render edilir. ve soru verileri quizcomponent isimli componente aktarılır. */}
+                                                                           {questions.length > 0 && (
+                                                                              <QuizComponent
+                                                                                 questions={questions}
+                                                                                 quizPoint={quizPoint}
+                                                                                 setQuizPoint={handlerQuizPoint}
+                                                                              />
+                                                                           )}
+                                                                        </Box>
+                                                                     </Box>
+                                                                  </Box>
+
+                                                                  {isQuizBtnVisible && (
+                                                                     <Button
+                                                                        style={{ marginTop: "12px" }}
+                                                                        size="medium"
+                                                                        color="success"
+                                                                        variant="contained"
+                                                                        onClick={handleFetchQuiz}>
+                                                                        Go to quiz
+                                                                     </Button>
+                                                                  )}
+                                                                  {/* öğreten mi öğretici mi olacağı burada tıkladığı buton ile karar verilir ve konferans işlemleri gerçekleşir */}
+                                                                  {quizPoint >= 80 ? (
+                                                                     <Button
+                                                                        onClick={() => {
+                                                                           handleClickLesson(content.related_lesson, lesson.lesson_title, "teach");
+                                                                        }}
+                                                                        style={{ marginLeft: "12px", marginTop: "12px" }}
+                                                                        type="button"
+                                                                        color="info"
+                                                                        variant="contained"
+                                                                        size="medium">
+                                                                        Teach this lesson
+                                                                     </Button>
+                                                                  ) : (
+                                                                     quizPoint > 0 &&
+                                                                     quizPoint <= 79 && (
+                                                                        <Button
+                                                                           onClick={() => {
+                                                                              handleClickLesson(
+                                                                                 content.related_lesson,
+                                                                                 lesson.lesson_title,
+                                                                                 "listen"
+                                                                              );
+                                                                           }}
+                                                                           style={{ marginLeft: "12px", marginTop: "12px" }}
+                                                                           type="button"
+                                                                           color="error"
+                                                                           variant="contained"
+                                                                           size="medium">
+                                                                           Listen from another student
+                                                                        </Button>
+                                                                     )
+                                                                  )}
+                                                               </Box>
+                                                            )
+                                                      )}
+                                                </Box>
+                                             </AccordionDetails>
+                                          </Accordion>
+                                          <Accordion>
+                                             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                                <Typography variant="h4">Forum</Typography>
+                                             </AccordionSummary>
+                                             <AccordionDetails>
+                                                <Box>
+                                                   <CommentComponent />
+                                                </Box>
+                                             </AccordionDetails>
+                                          </Accordion>
                                        </AccordionDetails>
                                     </Accordion>
                                  )
@@ -194,28 +235,12 @@ const Lessons = () => {
                   </AccordionDetails>
                </Accordion>
             ))}
-         {/* ilgili dersin video linkinden video id'sini alır ve modalı açar. Iframe ile youtube linkini ekrana yansıtır. */}
-         <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
-            <Box>
-               <Box style={style} marginTop={8}>
-                  <iframe
-                     width="560"
-                     height="315"
-                     src={`https://www.youtube.com/embed/${videoId}`}
-                     title="YouTube video player"
-                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                     allowFullScreen></iframe>
-               </Box>
-            </Box>
-         </Modal>
          {/* konferans oluşturulduktan sonra kullanıcıya bildirim gösterilmesi için kullanılır. */}
          <Snackbar open={isAlertOpen} autoHideDuration={6000} onClose={handleClose}>
             <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
                Ders anlatım video konferans linki oluşturuldu.
             </Alert>
          </Snackbar>
-         {/* quiz verisi varsa quiz componenti render edilir. ve soru verileri quizcomponent isimli componente aktarılır. */}
-         {questions.length > 0 && <QuizComponent questions={questions} quizPoint={quizPoint} setQuizPoint={handlerQuizPoint} />}
       </Box>
    );
 };
