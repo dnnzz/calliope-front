@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import PlayLessonIcon from "@mui/icons-material/PlayLesson";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import { UserContext } from "../../context/userContext";
 
 // Ekranın solunda bulunan sidebar componenti ilgili sayfalara yönlendirme yapan bir menü içerir.
 // React router'da bulunan Link componenti ile başlık ve gidilmesi istenen sayfa belirtilir.
@@ -36,6 +36,7 @@ const Sidebar = () => {
    const colors = tokens(theme.palette.mode);
    const [isCollapsed, setIsCollapsed] = useState(false);
    const [selected, setSelected] = useState("Dashboard");
+   const { user } = useContext(UserContext);
 
    return (
       <Box
@@ -91,7 +92,7 @@ const Sidebar = () => {
                      </Box>
                      <Box textAlign="center">
                         <Typography variant="h2" color={colors.grey[100]} fontWeight="bold" sx={{ m: "10px 0 0 0" }}>
-                           Calliope ADMIN
+                           {user.user_name}
                         </Typography>
                         <Typography variant="h5" color={colors.greenAccent[500]}>
                            Master admin

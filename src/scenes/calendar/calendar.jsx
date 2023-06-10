@@ -86,6 +86,7 @@ const Calendar = () => {
       } else {
          window.open(clickedEvent, "_blank");
       }
+      navigate("/conferance");
    };
    // sayfa ilk render olduğunda konferans verilerini çekmek için useEffect kullandık
    useEffect(() => {
