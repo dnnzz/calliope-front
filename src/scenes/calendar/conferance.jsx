@@ -117,7 +117,7 @@ const Conferance = () => {
                      </Button>
                   </Box>
                )}
-               {isSurveryAnswered && <PieChart data={surveyAnswers} />}
+               {isSurveryAnswered && surveyAnswers && <PieChart data={surveyAnswers} />}
             </Grid>
          </Grid>
       </Box>
