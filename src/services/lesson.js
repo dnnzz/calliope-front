@@ -1,5 +1,5 @@
 import axios from "axios";
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://calliope-api-g72rpkruuq-uc.a.run.app";
 const fetchCategories = async () => {
    try {
       const response = await axios.get(`${API_URL}/lesson/category/`);
@@ -24,6 +24,7 @@ const fetchCategories = async () => {
 const fetchLessons = async () => {
    try {
       const response = await axios.get(`${API_URL}/lesson/lesson/`);
+      console.log(response.data);
       return response.data;
    } catch (error) {
       console.error("Error fetching lessons:", error);
@@ -75,11 +76,10 @@ const createConference = async (conferenceData) => {
 const fetchData = async () => {
    try {
       const [categories, lessons, contents] = await Promise.all([fetchCategories(), fetchLessons(), fetchContents()]);
-
       const data = {
-         categories: categories.categories,
-         lessons: lessons.lessons,
-         contents: contents.contents,
+         categories: categories,
+         lessons: lessons,
+         contents: contents,
       };
       return data;
       // Process the retrieved data as needed
