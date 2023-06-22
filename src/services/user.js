@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://calliope-api-g72rpkruuq-uc.a.run.app";
+const API_URL = "http://localhost:8000";
 
 const getUsers = async () => {
    try {

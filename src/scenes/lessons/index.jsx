@@ -47,11 +47,20 @@ const Lessons = () => {
             conference_topic: lessonName,
          }).then((res) => {
             // konferans oluşturulduktan sonra kullanıcıya bildirim gösterilmesi için kullanılır.
-            if (res.status == "success") setAlertOpen(true);
+            if (res.status == "success") {
+               setAlertOpen(true);
+               setTimeout(()=>{
+                  navigate("/calendar/" + lessonId,{state:{
+                     isLearner:false
+                  }});
+               },1000)
+            }
          });
       if (type == "listen") {
          // ilgili ders id si ile konferanslar componentine yönlendirme yapar. ve lessonId parametresi ekler
-         navigate("/calendar/" + lessonId);
+         navigate("/calendar/" + lessonId,{state:{
+            isLearner:true
+         }});
       }
    };
    // ilgili dersin quiz verisini çeken fonksiyondur.
@@ -227,7 +236,7 @@ const Lessons = () => {
          {/* konferans oluşturulduktan sonra kullanıcıya bildirim gösterilmesi için kullanılır. */}
          <Snackbar open={isAlertOpen} autoHideDuration={6000} onClose={handleClose}>
             <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
-               Ders anlatım video konferans linki oluşturuldu.
+               Ders anlatım video konferans linki oluşturuldu.Dersler sayfasına yönlendiriliyorsunuz.
             </Alert>
          </Snackbar>
       </Box>
